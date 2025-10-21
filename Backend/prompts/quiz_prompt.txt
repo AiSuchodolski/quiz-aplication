@@ -1,0 +1,32 @@
+INSTRUKCJE:
+1. Stwórz pytanie wielokrotnego wyboru na podstawie tekstu: {user_path_data()}
+2. 4 odpowiedzi (A, B, C, D), tylko jedna prawidłowa
+3. Nie powtarzaj pytań z listy: {existing_questions}
+4. Pytanie musi sprawdzać zrozumienie tekstu
+5. Odpowiedzi błędne mają być prawdopodobne
+
+FORMAT ODPOWIEDZI (TYLKO CZYSTY JSON):
+{
+  "question": "Treść pytania",
+  "answers": {
+    "A": "Pierwsza odpowiedź",
+    "B": "Druga odpowiedź", 
+    "C": "Trzecia odpowiedź",
+    "D": "Czwarta odpowiedź"
+  },
+  "correct_answer": "A"
+}
+
+PRZYKŁAD:
+{
+  "question": "Kiedy rozpoczęła się II wojna światowa?",
+  "answers": {
+    "A": "1 września 1938 roku",
+    "B": "1 września 1939 roku",
+    "C": "3 września 1939 roku", 
+    "D": "1 września 1940 roku"
+  },
+  "correct_answer": "B"
+}
+
+Odpowiedz TYLKO w formacie JSON powyżej, bez dodatkowego tekstu.
