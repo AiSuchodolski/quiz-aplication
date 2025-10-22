@@ -1,21 +1,32 @@
 import os
-import openai
-import dotenv
+from openai import OpenAI
+from dotenv import load_dotenv
 import json
 from prompts import get_prompt
 
 
-dotenv.load_dotenv()
+load_dotenv()
 
 existing_questions = []
 
 prompt = get_prompt("quiz_prompt")
 
 
+def openai_key_test():
+    try:
+        openai_key = os.getenv('OPENAI_API_KEY')
+        if not openai_key:
+            raise ValueError("OPENAI_API_KEY not found in environment")
+        return ("OPENAI_API_KEY exists")
+    except Exception as e:
+        raise ValueError(f"Error getting OPENAI_API_KEY: {e}")
+
+
 def user_path_data():
-    folder_path = os.path.join("download", "data.txt")
+    folder_path = os.path.join("Backend", "download", "data.txt")
     if not os.path.exists(folder_path):
-        raise ValueError("Path to data.txt not found")
+        print(f"Path to data.txt not found: {folder_path}")
+        exit()
     try:
         with open(folder_path, "r", encoding="utf-8") as file:
             content = file.read()
@@ -28,13 +39,16 @@ def user_path_data():
 
 def get_ai_answers(content):
     try:
-        response = openai.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": f"{prompt}\n\n avoid this questions: {existing_questions}"},
-            {"role": "user", "content": content}
-        ]
-    )
+        # Ustawienie klucza API
+        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": f"{prompt}\n\n avoid this questions: {existing_questions}"},
+                {"role": "user", "content": content}
+            ]
+        )
         ai_answers = response.choices[0].message.content
         ai_answers = json.loads(ai_answers)
 
@@ -109,8 +123,6 @@ def start_quiz():
 current_question = None
 current_answers = None
 current_correct_answer = None
-
-
 
 
 def get_quiz_question():
@@ -195,45 +207,61 @@ def reset_quiz():
 
 
 if __name__ == "__main__":
-    print('==Test get_quiz_question==')
-    print('-' * 50)
+    main()
 
-    result = get_quiz_question()
-    if result:
-        print('Success ! File exists!')
-        print(f'Type of result: {type(result)}')
-        print(f'Result: {result}')
-        if isinstance(result, dict):
-            print('Result is a JSON object')
-            important_keys = ['question', 'answers', 'correct_answer']
-            for key in important_keys:
-                if key in result:
-                    print(f'{key}: {result[key]}')
-                else:
-                    print(f'Key {key} not found in result')
-        else:
-            print('Result is not a JSON object')
-    else:
-        if result is None:
-            print('Error: Result is None')
+#     print('==Test user_path_check==')
+#     print('-' * 50)
+
+#     current_dir = os.getcwd()
+#     dowland_path = os.path.join(current_dir, "download")
+#     data_path = os.path.join(dowland_path, "data.txt")
+
+#     print(f'Download path: {os.path.exists(dowland_path)}')
+#     print(f'Data path: {os.path.exists(data_path)}')
+#     print('-' * 50)
 
 
-    print('==Test check_answer==')
-    print('-' * 50)
-    print(f'Score: {score}')
-    print("-" * 50)
-    print(check_answer("A", "A"))
-    print("Odpowiedź prawidłowa!")
-    print("-" * 50)
-    print(check_answer("a", "A"))
-    print("Odpowiedź prawidłowa!")
-    print("-" * 50)
-    print(check_answer("B", "A"))
-    print("Odpowiedź nieprawidłowa!")
-    print("-" * 50)
-    print(check_answer("", "A"))
-    print(" Error2: Brak odpowiedzi użytkownika!")
-    print("-" * 50)
 
-    start_quiz()
-    get_quiz_question()
+#     print('==Test get_quiz_question==')
+#     print('-' * 50)
+
+#     result = get_quiz_question()
+#     if result:
+#         print('Success ! File exists!')
+#         print(f'Type of result: {type(result)}')
+#         print(f'Result: {result}')
+#         if isinstance(result, dict):
+#             print('Result is a JSON object')
+#             important_keys = ['question', 'answers', 'correct_answer']
+#             for key in important_keys:
+#                 if key in result:
+#                     print(f'{key}: {result[key]}')
+#                 else:
+#                     print(f'Key {key} not found in result')
+#         else:
+#             print('Result is not a JSON object')
+#     else:
+#         if result is None:
+#             print('Error: Result is None')
+
+
+#     print('==Test check_answer==')
+#     print('-' * 50)
+#     print(f'Score: {score}')
+#     print("-" * 50)
+#     print(check_answer("A", "A"))
+#     print("Odpowiedź prawidłowa!")
+#     print("-" * 50)
+#     print(check_answer("a", "A"))
+#     print("Odpowiedź prawidłowa!")
+#     print("-" * 50)
+#     print(check_answer("B", "A"))
+#     print("Odpowiedź nieprawidłowa!")
+#     print("-" * 50)
+#     print(check_answer("", "A"))
+#     print(" Error2: Brak odpowiedzi użytkownika!")
+#     print("-" * 50)
+
+
+
+
