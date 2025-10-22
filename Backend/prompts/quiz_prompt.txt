@@ -4,6 +4,7 @@ INSTRUKCJE:
 3. Nie powtarzaj pytań z listy: {existing_questions}
 4. Pytanie musi sprawdzać zrozumienie tekstu
 5. Odpowiedzi błędne mają być prawdopodobne
+6. Zmieniaj tak aby raz była poprawna odpowiedź A innym razem C innym B tak aby to było losowe.
 
 FORMAT ODPOWIEDZI (TYLKO CZYSTY JSON):
 {

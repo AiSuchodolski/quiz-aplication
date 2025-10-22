@@ -207,7 +207,7 @@ def reset_quiz():
 
 
 if __name__ == "__main__":
-    main()
+
 
 #     print('==Test user_path_check==')
 #     print('-' * 50)
