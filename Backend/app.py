@@ -7,9 +7,7 @@ from quiz_main import (existing_questions,
                         get_current_question, 
                         get_current_result, 
                         number_of_questions, 
-                        get_current_correct_answer,
-                        get_current_answers,
-                        get_current_number_of_questions)
+                        get_current_correct_answer)
 
 app = Flask(__name__)
 CORS(app)
