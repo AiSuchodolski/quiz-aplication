@@ -1,43 +1,23 @@
-Komendy
-init – komenda, która pozwoli Ci na utworzenie nowego repozytorium git na podstawie katalogu, w którym została wydana.
 
-git init
-clone – jest komendą, która utworzy kopię obecnego repozytorium do odrębnego katalogu wskazanego ścieżką w ramach komendy
-
-git clone /sciezka-do-katalogu
-ewentualnie możemy użyć poniższej komendy w sytuacji gdy kopia ma znaleźć się na serwerze zdalnym
-
-git clone username@host:/sciezka-do-repozytorium
-add – jest to komenda, która proponujemy zmiany dla konkretnego pliku
-
-git add nazwa-pliku
-lub dodajemy wszystkie pliki korzystając z *
-
-git add *
-commit – to komenda, którą przesyłamy finalnie wykonane zmiany do repozytorium dodając komentarz dotyczący wykonanych modyfikacji.
-
-git commit -m "Informacja dot. aktualizacji"
-push – pozwoli Ci wysłać zmiany do głównego repozytorium, w tym przykładzie master
-
-git push origin master
-lub w przypadku serwera zdalnego możesz użyć komendy
-
-git remote add origin serwer-docelowy
-checkout – Ta komenda pozwala na przywrócenie stanu pliku do ostatniego commit-a. Coś robimy, nie podoba nam się i chcemy szybko cofnąć zmiany.
-
-git checkout -- 
-branch – Polecenie to pokazuje, jaką gałąź mamy w repozytorium. Ewentualny znak -v oznacza verbose, czyli pokazuje nie tylko nazwy gałęzi, ale także ostatni hash i opis commitów. dodatkowe v, czyli very verbose oznacza, że do wszystkich tych informacji zostanie jeszcze dodana nazwa zdalnej gałęzi.
-
-git checkout -b feature_x
-pull – Polecenie git pull jest używane do wyciągania i pobierania zawartości ze zdalnego repozytorium i natychmiastowego aktualizowania lokalnego repozytorium zgodnie z tą zawartością. Scalanie zdalnych zmian master z lokalnym repozytorium jest częstym zadaniem w przepływach pracy opartych na współpracy Git. Polecenie git pull jest w rzeczywistości kombinacją dwóch innych poleceń, git fetch, a następnie git merge. W pierwszym kroku operacji git pull, polecenie git fetch zostanie wykonane w zakresie ograniczonym do lokalnej gałęzi wskazywanej przez wskaźnik HEAD. Po pobraniu zawartości, polecenie git pull przełączy się na przepływ pracy merge. Zostanie utworzony nowy commit scalający, a wskaźnik HEAD zostanie zaktualizowany, aby wskazywał na nowy commit.
-
-git pull
-merge – Polecenie git merge BranchB łączy z bieżącą gałęzią (tj. BranchA), gałąź o nazwie BranchB. Po wykonaniu tego polecenia, gałąź BranchA wskazuje na tę samą rewizję, co gałąź BranchB.
-
-git merge 
-diff – Podczas gdy git status odpowiada na oba te pytania w bardzo ogólny sposób, git diff pokazuje dokładnie, które linie zostały dodane, a które usunięte – w formie łatki. Powyższe polecenie porównuje zawartość katalogu roboczego z tym, co znajduje się w poczekalni. Wynik pokaże ci te zmiany, które jeszcze nie trafiły do poczekalni.
-
-git diff  
-log – Za pomocą komendy log sprawdzamy wszystkie commity jakie zostały wprowadzone w danej gałęzi
-
-git log --pretty=oneline
+1. ['pytanie', 'odpowiedz', 'kategoria', 'poziom']
+2. ['Co to jest Python?', 'Język programowania wysokiego poziomu', 'podstawy', 'łatwy']
+3. ['Kto stworzył Python?', 'Guido van Rossum', 'historia', 'łatwy']
+4. ['W którym roku powstał Python?', '1991', 'historia', 'średni']
+5. ['Co oznacza PEP?', 'Python Enhancement Proposal', 'standardy', 'średni']
+6. ['Jak nazywa się interpreter Pythona?', 'CPython', 'techniczne', 'trudny']
+7. ['Co to jest list comprehension?', 'Sposób na tworzenie list w jednej linii', 'składnia', 'średni']
+8. ['Jakie są typy danych w Python?', 'int, float, str, bool, list, dict, tuple', 'podstawy', 'łatwy']
+9. ['Co robi funkcja len()?', 'Zwraca długość obiektu', 'funkcje', 'łatwy']
+10. ['Co to jest pip?', 'Menedżer pakietów dla Python', 'narzędzia', 'średni']
+11. ['Jak zdefiniować funkcję w Python?', 'def nazwa_funkcji():', 'składnia', 'łatwy']
+12. ['pytanie', 'odpowiedz', 'kategoria', 'poziom']
+13. ['Co to jest Python?', 'Język programowania wysokiego poziomu', 'podstawy', 'łatwy']
+14. ['Kto stworzył Python?', 'Guido van Rossum', 'historia', 'łatwy']
+15. ['W którym roku powstał Python?', '1991', 'historia', 'średni']
+16. ['Co oznacza PEP?', 'Python Enhancement Proposal', 'standardy', 'średni']
+17. ['Jak nazywa się interpreter Pythona?', 'CPython', 'techniczne', 'trudny']
+18. ['Co to jest list comprehension?', 'Sposób na tworzenie list w jednej linii', 'składnia', 'średni']
+19. ['Jakie są typy danych w Python?', 'int, float, str, bool, list, dict, tuple', 'podstawy', 'łatwy']
+20. ['Co robi funkcja len()?', 'Zwraca długość obiektu', 'funkcje', 'łatwy']
+21. ['Co to jest pip?', 'Menedżer pakietów dla Python', 'narzędzia', 'średni']
+22. ['Jak zdefiniować funkcję w Python?', 'def nazwa_funkcji():', 'składnia', 'łatwy']
