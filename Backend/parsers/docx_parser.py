@@ -3,11 +3,11 @@ import docx
 
 
 def docx_parser():
-    docx_path = list(Path("..", "upload").glob("*.docx"))
+    docx_path = list(Path("upload").glob("*.docx"))
     if not docx_path:
         print("No DOCX files found in uploads folder")
-        exit()
-    data_path = Path("..", "data", "data.txt")
+        return False
+    data_path = Path("data", "data.txt")
     data_path.parent.mkdir(exist_ok=True)
     with data_path.open("a", encoding="utf-8", errors="ignore") as open_data_file:
         for docx_file in docx_path:
@@ -15,9 +15,11 @@ def docx_parser():
             for paragraph in doc.paragraphs:
                 open_data_file.write(f'{paragraph.text}\n')
     print(f"DOCX files parsed successfully and saved to {data_path}")
+    return True
 
 
-docx_parser()
+if __name__ == "__main__":
+    docx_parser()
 
 
 

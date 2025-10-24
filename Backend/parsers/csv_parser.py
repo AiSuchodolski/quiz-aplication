@@ -3,11 +3,11 @@ import csv
 
 
 def csv_parser():
-    csv_path = list(Path("..", "upload").glob("*.csv"))
+    csv_path = list(Path("upload").glob("*.csv"))
     if not csv_path:
         print("No CSV files found in uploads folder")
-        exit()
-    data_path = Path("..", "data", "data.txt")
+        return False
+    data_path = Path("data", "data.txt")
     data_path.parent.mkdir(exist_ok=True)
     with data_path.open("a", encoding="utf-8", errors="ignore") as open_data_file:
         for csv_file in csv_path:
@@ -16,7 +16,9 @@ def csv_parser():
                 for row in reader:
                     open_data_file.write(f'{row}\n')
     print(f"CSV files parsed successfully and saved to {data_path}")
+    return True
 
 
-csv_parser()
+if __name__ == "__main__":
+    csv_parser()
 

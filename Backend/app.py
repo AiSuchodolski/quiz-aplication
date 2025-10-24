@@ -1,5 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import os
+import shutil
+from pathlib import Path
 from quiz_main import (existing_questions, 
                         reset_quiz, 
                         get_quiz_question, 
@@ -8,6 +11,10 @@ from quiz_main import (existing_questions,
                         get_current_result, 
                         number_of_questions, 
                         get_current_correct_answer)
+from parsers.csv_parser import csv_parser
+from parsers.docx_parser import docx_parser
+from parsers.pdf_txt_parser import pdf_txt_parser
+from parsers.text_parser import text_parser
 
 app = Flask(__name__)
 CORS(app)
@@ -76,6 +83,161 @@ def quiz_answer():
 def quiz_result():
     result = get_current_result()
     return jsonify(result)
+
+
+@app.route('/quiz/upload', methods=['POST'])
+def quiz_upload():
+    try:
+        # print(request.files)
+        # print(request.files['file'])
+        if 'file' not in request.files:
+            return jsonify({"error": "Nie załączono pliku"}), 400
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "Nazwa pliku jest pusta"}), 400
+        if not file.filename.endswith(('.csv', '.docx', '.pdf', '.txt')):
+            return jsonify({"error": "Nieprawidłowy typ pliku"}), 400
+        
+        else:
+            upload_path = Path("Backend", "upload", file.filename)
+            if upload_path.exists():
+                return jsonify({"error": "Plik o takiej nazwie już istnieje"}), 400
+            upload_path.parent.mkdir(parents=True, exist_ok=True)
+            file.save(upload_path)
+            return jsonify({"message": "Plik załadowany pomyślnie", "file": file.filename, "status": "success"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @app.route('/upload', methods=['POST'])
+# def upload_files():
+#     try:
+#         if 'files' not in request.files:
+#             return jsonify({"error": "No files provided"}), 400
+        
+#         files = request.files.getlist('files')
+#         if not files or all(file.filename == '' for file in files):
+#             return jsonify({"error": "No files selected"}), 400
+        
+#         # Create upload directory if it doesn't exist
+#         upload_dir = Path("upload")
+#         upload_dir.mkdir(exist_ok=True)
+        
+#         # Clear existing files in upload directory
+#         for file_path in upload_dir.glob("*"):
+#             if file_path.is_file():
+#                 file_path.unlink()
+        
+#         uploaded_files = []
+#         for file in files:
+#             if file.filename:
+#                 filename = file.filename
+#                 file_path = upload_dir / filename
+#                 file.save(file_path)
+#                 uploaded_files.append(filename)
+        
+#         return jsonify({
+#             "message": "Files uploaded successfully",
+#             "files": uploaded_files,
+#             "status": "success"
+#         })
+    
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+
+# @app.route('/parse', methods=['POST'])
+# def parse_files():
+#     try:
+#         # Clear existing data.txt
+#         data_path = Path("data", "data.txt")
+#         data_path.parent.mkdir(exist_ok=True)
+#         if data_path.exists():
+#             data_path.unlink()
+        
+#         # Parse different file types
+#         parsed_files = []
+        
+#         # Check for CSV files
+#         csv_files = list(Path("upload").glob("*.csv"))
+#         if csv_files:
+#             csv_parser()
+#             parsed_files.extend([f.name for f in csv_files])
+        
+#         # Check for DOCX files
+#         docx_files = list(Path("upload").glob("*.docx"))
+#         if docx_files:
+#             docx_parser()
+#             parsed_files.extend([f.name for f in docx_files])
+        
+#         # Check for PDF files
+#         pdf_files = list(Path("upload").glob("*.pdf"))
+#         if pdf_files:
+#             pdf_txt_parser()
+#             parsed_files.extend([f.name for f in pdf_files])
+        
+#         # Check for TXT files
+#         txt_files = list(Path("upload").glob("*.txt"))
+#         if txt_files:
+#             text_parser()
+#             parsed_files.extend([f.name for f in txt_files])
+        
+#         if not parsed_files:
+#             return jsonify({"error": "No supported files found for parsing"}), 400
+        
+#         # Check if data.txt was created and has content
+#         if data_path.exists() and data_path.stat().st_size > 0:
+#             return jsonify({
+#                 "message": "Files parsed successfully",
+#                 "parsed_files": parsed_files,
+#                 "data_ready": True,
+#                 "status": "success"
+#             })
+#         else:
+#             return jsonify({"error": "Failed to parse files or data.txt is empty"}), 500
+    
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+
+# @app.route('/data/status')
+# def data_status():
+#     try:
+#         data_path = Path("data", "data.txt")
+#         if data_path.exists() and data_path.stat().st_size > 0:
+#             return jsonify({
+#                 "data_ready": True,
+#                 "file_size": data_path.stat().st_size,
+#                 "status": "success"
+#             })
+#         else:
+#             return jsonify({
+#                 "data_ready": False,
+#                 "status": "success"
+#             })
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

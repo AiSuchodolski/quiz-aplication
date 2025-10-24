@@ -3,11 +3,11 @@ import PyPDF2
 
 
 def pdf_txt_parser():
-    pdf_path = list(Path("..", "upload").glob("*.pdf"))
+    pdf_path = list(Path("upload").glob("*.pdf"))
     if not pdf_path:
         print("No PDF files found in uploads folder")
-        exit()
-    data_path = Path("..", "data", "data.txt")
+        return False
+    data_path = Path("data", "data.txt")
     data_path.parent.mkdir(exist_ok=True)
     with data_path.open("a", encoding="utf-8", errors="ignore") as open_data_file:
         for pdf_file in pdf_path:
@@ -16,9 +16,11 @@ def pdf_txt_parser():
                 for page in reader.pages:
                     open_data_file.write(page.extract_text())
     print(f"PDF files parsed successfully and saved to {data_path}")
+    return True
 
 
-pdf_txt_parser()
+if __name__ == "__main__":
+    pdf_txt_parser()
 
 
 

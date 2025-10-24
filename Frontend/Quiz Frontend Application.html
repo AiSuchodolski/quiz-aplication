@@ -26,7 +26,7 @@
           border-radius: 20px;
           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
           padding: 40px;
-          max-width: 800px;
+          max-width: 900px;
           width: 100%;
           text-align: center;
       }
@@ -46,6 +46,10 @@
 
       .welcome-screen {
           display: block;
+      }
+
+      .upload-screen {
+          display: none;
       }
 
       .quiz-screen {
@@ -78,6 +82,98 @@
           background: #ccc;
           cursor: not-allowed;
           transform: none;
+      }
+
+      .btn-secondary {
+          background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+      }
+
+      .btn-success {
+          background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      }
+
+      .upload-area {
+          border: 3px dashed #667eea;
+          border-radius: 15px;
+          padding: 40px;
+          margin: 20px 0;
+          background: #f8f9fa;
+          transition: all 0.3s ease;
+      }
+
+      .upload-area:hover {
+          border-color: #764ba2;
+          background: #f0f4ff;
+      }
+
+      .upload-area.dragover {
+          border-color: #28a745;
+          background: #d4edda;
+      }
+
+      .file-input {
+          display: none;
+      }
+
+      .file-list {
+          margin: 20px 0;
+          text-align: left;
+      }
+
+      .file-item {
+          background: #e9ecef;
+          border-radius: 10px;
+          padding: 15px;
+          margin: 10px 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+
+      .file-item.success {
+          background: #d4edda;
+          border: 1px solid #c3e6cb;
+      }
+
+      .file-item.error {
+          background: #f8d7da;
+          border: 1px solid #f5c6cb;
+      }
+
+      .file-info {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+
+      .file-icon {
+          font-size: 1.5em;
+      }
+
+      .supported-formats {
+          background: #e3f2fd;
+          border-radius: 10px;
+          padding: 20px;
+          margin: 20px 0;
+          text-align: left;
+      }
+
+      .supported-formats h3 {
+          color: #1976d2;
+          margin-bottom: 15px;
+      }
+
+      .format-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 10px;
+      }
+
+      .format-item {
+          background: white;
+          padding: 10px;
+          border-radius: 5px;
+          border: 1px solid #bbdefb;
       }
 
       .question-card {
@@ -234,6 +330,31 @@
           margin: 15px 0;
       }
 
+      .success-message {
+          background: #d4edda;
+          color: #155724;
+          border: 1px solid #c3e6cb;
+          border-radius: 10px;
+          padding: 15px;
+          margin: 15px 0;
+      }
+
+      .progress-bar {
+          width: 100%;
+          height: 20px;
+          background: #e9ecef;
+          border-radius: 10px;
+          overflow: hidden;
+          margin: 20px 0;
+      }
+
+      .progress-fill {
+          height: 100%;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          transition: width 0.3s ease;
+          width: 0%;
+      }
+
       @media (max-width: 768px) {
           .container {
               padding: 20px;
@@ -247,6 +368,10 @@
           .logo {
               font-size: 2em;
           }
+
+          .format-list {
+              grid-template-columns: 1fr;
+          }
       }
   </style>
 </head>
@@ -258,16 +383,64 @@
           <div class="subtitle">Sprawdź swoją wiedzę!</div>
           
           <div class="rules">
-              <h3>Zasady gry:</h3>
+              <h3>Jak to działa:</h3>
               <ul>
-                  <li>Zadawane pytania dotyczą przesłanych przez ciebie materiałów</li>
-                  <li>Z podanych odpowiedzi tylko jedna jest prawidłowa</li>
-                  <li>Wybierz odpowiedź A, B, C lub D</li>
-                  <li>Możesz zakończyć quiz w każdej chwili</li>
+                  <li>Prześlij pliki z materiałami do nauki (PDF, DOCX, CSV, TXT)</li>
+                  <li>System przetworzy zawartość i przygotuje pytania</li>
+                  <li>Rozpocznij quiz na podstawie przesłanych materiałów</li>
+                  <li>Sprawdź swoją wiedzę i popraw wyniki!</li>
               </ul>
           </div>
           
-          <button class="btn" onclick="startQuiz()">Rozpocznij Quiz</button>
+          <button class="btn" onclick="showUploadScreen()">Prześlij pliki</button>
+          <button class="btn btn-secondary" onclick="checkDataStatus()">Sprawdź czy dane są gotowe</button>
+      </div>
+
+      <!-- Upload Screen -->
+      <div id="uploadScreen" class="upload-screen">
+          <div class="logo">📁 Prześlij pliki</div>
+          <div class="subtitle">Wybierz pliki z materiałami do nauki</div>
+          
+          <div class="supported-formats">
+              <h3>Obsługiwane formaty:</h3>
+              <div class="format-list">
+                  <div class="format-item">
+                      <strong>📄 PDF</strong><br>
+                      Dokumenty PDF
+                  </div>
+                  <div class="format-item">
+                      <strong>📝 DOCX</strong><br>
+                      Dokumenty Word
+                  </div>
+                  <div class="format-item">
+                      <strong>📊 CSV</strong><br>
+                      Arkusze danych
+                  </div>
+                  <div class="format-item">
+                      <strong>📄 TXT</strong><br>
+                      Pliki tekstowe
+                  </div>
+              </div>
+          </div>
+
+          <div class="upload-area" id="uploadArea">
+              <div style="font-size: 3em; margin-bottom: 20px;">📁</div>
+              <h3>Przeciągnij pliki tutaj lub kliknij aby wybrać</h3>
+              <p>Możesz przesłać wiele plików jednocześnie</p>
+              <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.docx,.csv,.txt">
+          </div>
+
+          <div id="fileList" class="file-list"></div>
+          <div id="uploadProgress" class="progress-bar" style="display: none;">
+              <div class="progress-fill" id="progressFill"></div>
+          </div>
+
+          <div id="uploadMessage"></div>
+
+          <button class="btn btn-success" id="parseBtn" onclick="parseFiles()" style="display: none;">
+              Przetwórz pliki i przygotuj quiz
+          </button>
+          <button class="btn btn-secondary" onclick="backToWelcome()">Powrót</button>
       </div>
 
       <!-- Quiz Screen -->
@@ -288,7 +461,7 @@
           </div>
           
           <button class="btn" id="nextBtn" onclick="nextQuestion()" style="display: none;">Następne pytanie</button>
-          <button class="btn" onclick="quitQuiz()">Zakończ quiz</button>
+          <button class="btn btn-secondary" onclick="quitQuiz()">Zakończ quiz</button>
       </div>
 
       <!-- Result Screen -->
@@ -297,6 +470,7 @@
           <div class="final-score" id="finalScore">0/0</div>
           <div id="resultMessage"></div>
           <button class="btn" onclick="restartQuiz()">Zagraj ponownie</button>
+          <button class="btn btn-secondary" onclick="backToWelcome()">Prześlij nowe pliki</button>
       </div>
 
       <!-- Error messages -->
@@ -309,6 +483,7 @@
       let selectedAnswer = null;
       let totalQuestions = 0;
       let currentScore = 0;
+      let uploadedFiles = [];
 
       // Show error message
       function showError(message) {
@@ -320,6 +495,208 @@
           }, 5000);
       }
 
+      // Show success message
+      function showSuccess(message) {
+          const messageDiv = document.getElementById('uploadMessage');
+          messageDiv.innerHTML = `<div class="success-message">${message}</div>`;
+      }
+
+      // Show upload screen
+      function showUploadScreen() {
+          document.getElementById('welcomeScreen').style.display = 'none';
+          document.getElementById('uploadScreen').style.display = 'block';
+          setupFileUpload();
+      }
+
+      // Back to welcome screen
+      function backToWelcome() {
+          document.getElementById('uploadScreen').style.display = 'none';
+          document.getElementById('quizScreen').style.display = 'none';
+          document.getElementById('resultScreen').style.display = 'none';
+          document.getElementById('welcomeScreen').style.display = 'block';
+          uploadedFiles = [];
+          document.getElementById('fileList').innerHTML = '';
+          document.getElementById('uploadMessage').innerHTML = '';
+      }
+
+      // Setup file upload
+      function setupFileUpload() {
+          const uploadArea = document.getElementById('uploadArea');
+          const fileInput = document.getElementById('fileInput');
+
+          // Click to upload
+          uploadArea.addEventListener('click', () => fileInput.click());
+
+          // Drag and drop
+          uploadArea.addEventListener('dragover', (e) => {
+              e.preventDefault();
+              uploadArea.classList.add('dragover');
+          });
+
+          uploadArea.addEventListener('dragleave', () => {
+              uploadArea.classList.remove('dragover');
+          });
+
+          uploadArea.addEventListener('drop', (e) => {
+              e.preventDefault();
+              uploadArea.classList.remove('dragover');
+              const files = e.dataTransfer.files;
+              handleFiles(files);
+          });
+
+          // File input change
+          fileInput.addEventListener('change', (e) => {
+              handleFiles(e.target.files);
+          });
+      }
+
+      // Handle selected files
+      function handleFiles(files) {
+          const fileList = document.getElementById('fileList');
+          fileList.innerHTML = '';
+          uploadedFiles = [];
+
+          Array.from(files).forEach(file => {
+              if (isValidFileType(file)) {
+                  uploadedFiles.push(file);
+                  addFileToList(file);
+              } else {
+                  showError(`Nieobsługiwany format pliku: ${file.name}`);
+              }
+          });
+
+          if (uploadedFiles.length > 0) {
+              uploadFiles();
+          }
+      }
+
+      // Check if file type is valid
+      function isValidFileType(file) {
+          const validTypes = ['.pdf', '.docx', '.csv', '.txt'];
+          const fileName = file.name.toLowerCase();
+          return validTypes.some(type => fileName.endsWith(type));
+      }
+
+      // Add file to list
+      function addFileToList(file) {
+          const fileList = document.getElementById('fileList');
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item';
+          fileItem.id = `file-${file.name}`;
+          
+          const fileIcon = getFileIcon(file.name);
+          fileItem.innerHTML = `
+              <div class="file-info">
+                  <span class="file-icon">${fileIcon}</span>
+                  <span>${file.name}</span>
+              </div>
+              <div class="loading"></div>
+          `;
+          
+          fileList.appendChild(fileItem);
+      }
+
+      // Get file icon
+      function getFileIcon(fileName) {
+          const ext = fileName.toLowerCase().split('.').pop();
+          const icons = {
+              'pdf': '📄',
+              'docx': '📝',
+              'csv': '📊',
+              'txt': '📄'
+          };
+          return icons[ext] || '📄';
+      }
+
+      // Upload files
+      async function uploadFiles() {
+          try {
+              const formData = new FormData();
+              uploadedFiles.forEach(file => {
+                  formData.append('files', file);
+              });
+
+              const response = await fetch(`${API_BASE_URL}/upload`, {
+                  method: 'POST',
+                  body: formData
+              });
+
+              const result = await response.json();
+
+              if (result.status === 'success') {
+                  // Update file list with success status
+                  result.files.forEach(fileName => {
+                      const fileItem = document.getElementById(`file-${fileName}`);
+                      if (fileItem) {
+                          fileItem.classList.add('success');
+                          fileItem.querySelector('.loading').innerHTML = '✅';
+                      }
+                  });
+                  
+                  showSuccess(`Pomyślnie przesłano ${result.files.length} plików!`);
+                  document.getElementById('parseBtn').style.display = 'inline-block';
+              } else {
+                  throw new Error(result.error || 'Błąd podczas przesyłania plików');
+              }
+          } catch (error) {
+              showError('Błąd podczas przesyłania plików: ' + error.message);
+              // Update file list with error status
+              uploadedFiles.forEach(file => {
+                  const fileItem = document.getElementById(`file-${file.name}`);
+                  if (fileItem) {
+                      fileItem.classList.add('error');
+                      fileItem.querySelector('.loading').innerHTML = '❌';
+                  }
+              });
+          }
+      }
+
+      // Parse files
+      async function parseFiles() {
+          try {
+              document.getElementById('parseBtn').innerHTML = '<span class="loading"></span>Przetwarzanie...';
+              document.getElementById('parseBtn').disabled = true;
+
+              const response = await fetch(`${API_BASE_URL}/parse`, {
+                  method: 'POST'
+              });
+
+              const result = await response.json();
+
+              if (result.status === 'success' && result.data_ready) {
+                  showSuccess(`Pliki zostały przetworzone! Gotowe do rozpoczęcia quizu.`);
+                  setTimeout(() => {
+                      startQuiz();
+                  }, 2000);
+              } else {
+                  throw new Error(result.error || 'Błąd podczas przetwarzania plików');
+              }
+          } catch (error) {
+              showError('Błąd podczas przetwarzania plików: ' + error.message);
+              document.getElementById('parseBtn').innerHTML = 'Przetwórz pliki i przygotuj quiz';
+              document.getElementById('parseBtn').disabled = false;
+          }
+      }
+
+      // Check data status
+      async function checkDataStatus() {
+          try {
+              const response = await fetch(`${API_BASE_URL}/data/status`);
+              const result = await response.json();
+
+              if (result.data_ready) {
+                  showSuccess('Dane są gotowe! Możesz rozpocząć quiz.');
+                  setTimeout(() => {
+                      startQuiz();
+                  }, 1500);
+              } else {
+                  showError('Brak danych. Najpierw prześlij i przetwórz pliki.');
+              }
+          } catch (error) {
+              showError('Błąd podczas sprawdzania statusu danych: ' + error.message);
+          }
+      }
+
       // Start quiz
       async function startQuiz() {
           try {
@@ -327,7 +704,7 @@
               const data = await response.json();
               
               if (data.status === 'success') {
-                  document.getElementById('welcomeScreen').style.display = 'none';
+                  document.getElementById('uploadScreen').style.display = 'none';
                   document.getElementById('quizScreen').style.display = 'block';
                   loadQuestion();
               } else {
@@ -502,11 +879,12 @@
       // Restart quiz
       function restartQuiz() {
           document.getElementById('resultScreen').style.display = 'none';
-          document.getElementById('welcomeScreen').style.display = 'block';
+          document.getElementById('quizScreen').style.display = 'block';
           currentScore = 0;
           totalQuestions = 0;
           selectedAnswer = null;
           currentQuestionData = null;
+          loadQuestion();
       }
 
       // Handle keyboard shortcuts
