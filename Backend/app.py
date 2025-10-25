@@ -134,12 +134,12 @@ def quiz_processing_post():
 
 @app.route('/quiz/write_data', methods=['POST'])
 def quiz_write_data():
-    global file_names
     try:
         file_path = Path("upload", request.json['filename'])
         data_file_path = Path("data", "data.txt")
         with data_file_path.open("a", encoding="utf-8") as open_data_file:
-            return processing_upload_files(file_path, open_data_file)
+            result = processing_upload_files(file_path, open_data_file)
+            return jsonify(result)
     except Exception as e:
         return jsonify({"status" : "error", "message": str(e)}), 500
         
