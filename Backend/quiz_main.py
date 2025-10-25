@@ -23,7 +23,7 @@ def openai_key_test():
 
 
 def user_path_data():
-    folder_path = os.path.join("Backend", "data", "data.txt")
+    folder_path = os.path.join("data", "data.txt")
     if not os.path.exists(folder_path):
         print(f"Path to data.txt not found: {folder_path}")
         exit()

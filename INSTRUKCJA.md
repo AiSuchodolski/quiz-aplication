@@ -106,3 +106,4 @@ quiz-aplication/
 - Sprawdź czy data.txt został utworzony i zawiera dane
 - Sprawdź czy masz ustawiony klucz OpenAI
 - Sprawdź czy backend odpowiada na endpointy quizu
+

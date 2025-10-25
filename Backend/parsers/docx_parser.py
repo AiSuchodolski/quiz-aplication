@@ -3,6 +3,7 @@ import docx
 
 
 def docx_parser():
+    print("docx_parser wywołany")
     docx_path = list(Path("upload").glob("*.docx"))
     if not docx_path:
         print("No DOCX files found in uploads folder")

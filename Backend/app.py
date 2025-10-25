@@ -1,7 +1,5 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import os
-import shutil
 from pathlib import Path
 from quiz_main import (existing_questions, 
                         reset_quiz, 
@@ -11,10 +9,7 @@ from quiz_main import (existing_questions,
                         get_current_result, 
                         number_of_questions, 
                         get_current_correct_answer)
-from parsers.csv_parser import csv_parser
-from parsers.docx_parser import docx_parser
-from parsers.pdf_txt_parser import pdf_txt_parser
-from parsers.text_parser import text_parser
+from processing import processing_upload_files
 
 app = Flask(__name__)
 CORS(app)
@@ -54,7 +49,7 @@ def quiz_question():
             "question" : question["question"],   
             "number_of_questions" : len(existing_questions),
             "answers" : question["answers"],
-            "correct_answer" : question["correct_answer"],
+            # "correct_answer" : question["correct_answer"],
             "status" : "success"
         })
     except Exception as e:
@@ -83,32 +78,34 @@ def quiz_result():
     result = get_current_result()
     return jsonify({"status" : "success", "result": result})
 
-
+file_names = []
 @app.route('/quiz/upload', methods=['POST'])
 def quiz_upload():
-    try:
+    global file_names
+    try:   
         if 'file' not in request.files:
             return jsonify({"status" : "error", "message": "Nie załączono pliku"}), 400
-        file = request.files['file']
+        file = request.files['file']  
         if file.filename == '':
             return jsonify({"status" : "error", "message": "Nazwa pliku jest pusta"}), 400
         if not file.filename.endswith(('.csv', '.docx', '.pdf', '.txt')):
-            return jsonify({"status" : "error", "message": "Nieprawidłowy typ pliku"}), 400
-        
-        else:
-            upload_path = Path("Backend", "upload", file.filename)
-            if upload_path.exists():
-                return jsonify({"status" : "error", "message": "Plik o takiej nazwie już istnieje"}), 400
+            return jsonify({"status" : "error", "message": "Nieprawidłowy typ pliku"}), 400        
+        if file.filename in file_names:
+            return jsonify({"status" : "error", "message": "Plik o takiej nazwie został już przetworzony"}), 400
+        upload_path = Path("upload", file.filename)
+        if upload_path.exists():
+            return jsonify({"status" : "error", "message": "Plik o takiej nazwie istnieje i czeka na przetworzenie"}), 400
+        else:    
             upload_path.parent.mkdir(parents=True, exist_ok=True)
             file.save(upload_path)
-            return jsonify({"message": "Plik załadowany pomyślnie", "file": file.filename, "status": "success"})
+            return jsonify({"message": "Plik załadowany pomyślnie i czeka na przetworzenie", "file": file.filename, "status": "success"})
     except Exception as e:
         return jsonify({"status" : "error", "message": str(e)}), 500  
 
 
 @app.route('/quiz/processing', methods=['GET'])
 def quiz_processing_get():
-    data_path = Path("Backend", "data", "data.txt")
+    data_path = Path("data", "data.txt")
     if not data_path.exists():
         return jsonify({"status" : "no-data", "message" : "Obecnie brak danych do quizu"}), 200
     try:
@@ -123,7 +120,7 @@ def quiz_processing_get():
 
 @app.route('/quiz/processing', methods=['POST'])
 def quiz_processing_post():
-    data_path = Path("Backend", "data", "data.txt")
+    data_path = Path("data", "data.txt")
     try:     
         if request.json['user_decision'] == True:
             return jsonify({"status": "success", "message": "Dotychczasowe dane zostały zachowane"})
@@ -135,6 +132,28 @@ def quiz_processing_post():
         return jsonify({"status" : "error", "message": str(e)}), 500
 
 
+@app.route('/quiz/write_data', methods=['POST'])
+def quiz_write_data():
+    global file_names
+    try:
+        file_path = Path("upload", request.json['filename'])
+        data_file_path = Path("data", "data.txt")
+        with data_file_path.open("a", encoding="utf-8") as open_data_file:
+            return processing_upload_files(file_path, open_data_file)
+    except Exception as e:
+        return jsonify({"status" : "error", "message": str(e)}), 500
+        
+
+@app.route('/quiz/delete_upload_file', methods=['DELETE'])
+def quiz_delete_upload_file():
+    global file_names
+    try:
+        file_path = Path("upload", request.json['filename'])
+        file_path.unlink()
+        file_names.append(request.json['filename'])
+        return jsonify({"status" : "success", "message": "Plik usunięty z folderu upload", "file": request.json['filename']})
+    except Exception as e:
+        return jsonify({"status" : "error", "message": str(e)}), 500
 
 
 

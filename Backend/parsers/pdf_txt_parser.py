@@ -3,6 +3,7 @@ import PyPDF2
 
 
 def pdf_txt_parser():
+    print("pdf_txt_parser wywołany")
     pdf_path = list(Path("upload").glob("*.pdf"))
     if not pdf_path:
         print("No PDF files found in uploads folder")
