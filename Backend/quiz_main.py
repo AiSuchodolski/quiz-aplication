@@ -3,6 +3,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import json
 from prompts import get_prompt
+from pathlib import Path
 
 
 load_dotenv()
@@ -203,6 +204,20 @@ def reset_quiz():
     number_of_questions = 1
     existing_questions.clear()    
     return True
+
+
+def delete_upload_folder():
+    try:
+        upload_folder = Path("upload")
+        if upload_folder.exists():
+            for file_path in upload_folder.glob("*"):
+                if file_path.is_file():
+                    file_path.unlink()
+            return {"status" : "success", "message": "Pliki z folderu upload zostały usunięte"}
+        else:
+            return {"status" : "error", "message": "Folder upload nie istnieje"}
+    except Exception as e:
+        return {"status" : "error", "message": str(e)}
 
 
 

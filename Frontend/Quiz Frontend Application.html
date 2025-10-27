@@ -394,6 +394,7 @@
           
           <button class="btn" onclick="showUploadScreen()">Prześlij pliki</button>
           <button class="btn btn-secondary" onclick="checkDataStatus()">Sprawdź czy dane są gotowe</button>
+          <button class="btn btn-secondary" onclick="deleteData()" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">Usuń dane</button>
       </div>
 
       <!-- Upload Screen -->
@@ -694,6 +695,30 @@
               }
           } catch (error) {
               showError('Błąd podczas sprawdzania statusu danych: ' + error.message);
+          }
+      }
+
+      // Delete data
+      async function deleteData() {
+          if (!confirm('Czy na pewno chcesz usunąć wszystkie dane? Ta operacja jest nieodwracalna.')) {
+              return;
+          }
+
+          try {
+              const response = await fetch(`${API_BASE_URL}/data/delete`, {
+                  method: 'POST'
+              });
+              const result = await response.json();
+
+              if (result.status === 'success') {
+                  showSuccess('Dane zostały usunięte pomyślnie!');
+                  // Clear the upload folder display
+                  uploadedFiles = [];
+              } else {
+                  throw new Error(result.error || 'Błąd podczas usuwania danych');
+              }
+          } catch (error) {
+              showError('Błąd podczas usuwania danych: ' + error.message);
           }
       }
 

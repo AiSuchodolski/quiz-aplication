@@ -484,7 +484,7 @@
                     </div>
                 </div>
 
-                <div id="uploadMessage"></div>
+                <div id="dataMessage"></div>
 
                 <div style="text-align: center; margin-top: 30px;">
                     <button class="btn btn-secondary" onclick="backToMain()">Powrót</button>
@@ -583,6 +583,16 @@
         let currentFileName = null;
         let isProcessing = false;
 
+        // Inicjalizacja aplikacji - wyczyść folder upload przy starcie
+        window.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await fetch(`${API_BASE_URL}/quiz/start`);
+                console.log('Upload folder został wyczyszczony');
+            } catch (error) {
+                console.error('Błąd podczas czyszczenia folderu upload:', error);
+            }
+        });
+
         // Funkcje pomocnicze
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
@@ -594,8 +604,18 @@
         }
 
         function showSuccess(message) {
-            const messageDiv = document.getElementById('uploadMessage');
-            messageDiv.innerHTML = `<div class="success-message">${message}</div>`;
+            // Sprawdź który ekran jest aktywny
+            const uploadMessage = document.getElementById('uploadMessage');
+            const dataMessage = document.getElementById('dataMessage');
+            
+            if (uploadMessage && document.getElementById('uploadScreen').classList.contains('active')) {
+                uploadMessage.innerHTML = `<div class="success-message">${message}</div>`;
+            } else if (dataMessage && document.getElementById('dataScreen').classList.contains('active')) {
+                dataMessage.innerHTML = `<div class="success-message">${message}</div>`;
+            } else if (uploadMessage) {
+                // Fallback do uploadMessage jeśli aktywny jest inny ekran
+                uploadMessage.innerHTML = `<div class="success-message">${message}</div>`;
+            }
         }
 
         function showScreen(screenId) {
@@ -616,6 +636,9 @@
                 const statusIndicator = document.getElementById('statusIndicator');
                 statusIndicator.textContent = 'Sprawdzanie...';
                 statusIndicator.className = 'status-indicator';
+                
+                // Wyczyść komunikaty z poprzedniego ekranu
+                document.getElementById('dataMessage').innerHTML = '';
 
                 const response = await fetch(`${API_BASE_URL}/quiz/processing`);
                 const result = await response.json();
@@ -671,7 +694,7 @@
 
         // Pokaż opcje po zachowaniu danych
         function showDataKeptOptions() {
-            const messageDiv = document.getElementById('uploadMessage');
+            const messageDiv = document.getElementById('dataMessage');
             messageDiv.innerHTML = `
                 <div class="success-message" style="margin-bottom: 20px;">
                     Dane zostały zachowane! Co chcesz zrobić dalej?
@@ -833,6 +856,7 @@
                 });
 
                 const result = await response.json();
+                console.log('Upload result:', result);
 
                 if (result.status === 'success') {
                     fileItem.classList.add('success');
@@ -886,6 +910,7 @@
                 });
 
                 const writeResult = await writeResponse.json();
+                console.log('Write data result:', writeResult);
                 if (writeResult.status !== 'success') {
                     throw new Error(writeResult.message || 'Błąd podczas zapisywania danych');
                 }
@@ -908,14 +933,28 @@
 
                 showSuccess(`Plik ${fileName} został przetworzony i dodany do bazy danych!`);
                 
+                // Resetuj stan przetwarzania
+                isProcessing = false;
+                
                 // Pokaż opcje po przetworzeniu pliku
                 setTimeout(() => {
                     showFileProcessedOptions();
                 }, 2000);
 
             } catch (error) {
+                console.error('Error in processFile:', error);
                 showError('Błąd podczas przetwarzania pliku: ' + error.message);
                 isProcessing = false;
+                currentFileName = null;
+                // Usuń spinner i pokaż komunikat błędu
+                const fileItem = document.querySelector('.file-item');
+                if (fileItem) {
+                    const spinner = fileItem.querySelector('.loading');
+                    if (spinner) {
+                        spinner.innerHTML = '❌';
+                    }
+                    fileItem.classList.add('error');
+                }
             }
         }
 

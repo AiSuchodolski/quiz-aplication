@@ -8,7 +8,8 @@ from quiz_main import (existing_questions,
                         get_current_question, 
                         get_current_result, 
                         number_of_questions, 
-                        get_current_correct_answer)
+                        get_current_correct_answer,
+                        delete_upload_folder)
 from processing import processing_upload_files
 
 app = Flask(__name__)
@@ -28,18 +29,25 @@ def quiz():
         "version" : "1.0.0"
     })
 
+
+
 @app.route('/quiz/start')
 def quiz_start():
     reset_quiz()
-    return jsonify({
-        "message" : "Witaj w quizie! Powodzenia!",
-        "rules" : [
-            "Zadawane pytania dotyczą przesłanych przez ciebie materiałów.",
-            "Z podanych odpowiedzi tylko jedna jest prawidłowa.",
-            "Podaj A, B, C lub D.",
-        ],
-        "status" : "success"
-    })
+    result = delete_upload_folder()
+    if result["status"] == "success":
+        return jsonify({
+            "message" : "Witaj w quizie! Powodzenia!",
+            "rules" : [
+                "Zadawane pytania dotyczą przesłanych przez ciebie materiałów.",
+                "Z podanych odpowiedzi tylko jedna jest prawidłowa.",
+                "Podaj A, B, C lub D.",
+            ],
+            "status" : "success"
+        })
+    else:
+        return jsonify({"status" : "error", "message": result["message"]}), 500
+
 
 @app.route('/quiz/question')
 def quiz_question():
@@ -49,7 +57,6 @@ def quiz_question():
             "question" : question["question"],   
             "number_of_questions" : len(existing_questions),
             "answers" : question["answers"],
-            # "correct_answer" : question["correct_answer"],
             "status" : "success"
         })
     except Exception as e:
@@ -154,134 +161,6 @@ def quiz_delete_upload_file():
         return jsonify({"status" : "success", "message": "Plik usunięty z folderu upload", "file": request.json['filename']})
     except Exception as e:
         return jsonify({"status" : "error", "message": str(e)}), 500
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# @app.route('/upload', methods=['POST'])
-# def upload_files():
-#     try:
-#         if 'files' not in request.files:
-#             return jsonify({"error": "No files provided"}), 400
-        
-#         files = request.files.getlist('files')
-#         if not files or all(file.filename == '' for file in files):
-#             return jsonify({"error": "No files selected"}), 400
-        
-#         # Create upload directory if it doesn't exist
-#         upload_dir = Path("upload")
-#         upload_dir.mkdir(exist_ok=True)
-        
-#         # Clear existing files in upload directory
-#         for file_path in upload_dir.glob("*"):
-#             if file_path.is_file():
-#                 file_path.unlink()
-        
-#         uploaded_files = []
-#         for file in files:
-#             if file.filename:
-#                 filename = file.filename
-#                 file_path = upload_dir / filename
-#                 file.save(file_path)
-#                 uploaded_files.append(filename)
-        
-#         return jsonify({
-#             "message": "Files uploaded successfully",
-#             "files": uploaded_files,
-#             "status": "success"
-#         })
-    
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-
-# @app.route('/parse', methods=['POST'])
-# def parse_files():
-#     try:
-#         # Clear existing data.txt
-#         data_path = Path("data", "data.txt")
-#         data_path.parent.mkdir(exist_ok=True)
-#         if data_path.exists():
-#             data_path.unlink()
-        
-#         # Parse different file types
-#         parsed_files = []
-        
-#         # Check for CSV files
-#         csv_files = list(Path("upload").glob("*.csv"))
-#         if csv_files:
-#             csv_parser()
-#             parsed_files.extend([f.name for f in csv_files])
-        
-#         # Check for DOCX files
-#         docx_files = list(Path("upload").glob("*.docx"))
-#         if docx_files:
-#             docx_parser()
-#             parsed_files.extend([f.name for f in docx_files])
-        
-#         # Check for PDF files
-#         pdf_files = list(Path("upload").glob("*.pdf"))
-#         if pdf_files:
-#             pdf_txt_parser()
-#             parsed_files.extend([f.name for f in pdf_files])
-        
-#         # Check for TXT files
-#         txt_files = list(Path("upload").glob("*.txt"))
-#         if txt_files:
-#             text_parser()
-#             parsed_files.extend([f.name for f in txt_files])
-        
-#         if not parsed_files:
-#             return jsonify({"error": "No supported files found for parsing"}), 400
-        
-#         # Check if data.txt was created and has content
-#         if data_path.exists() and data_path.stat().st_size > 0:
-#             return jsonify({
-#                 "message": "Files parsed successfully",
-#                 "parsed_files": parsed_files,
-#                 "data_ready": True,
-#                 "status": "success"
-#             })
-#         else:
-#             return jsonify({"error": "Failed to parse files or data.txt is empty"}), 500
-    
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-
-# @app.route('/data/status')
-# def data_status():
-#     try:
-#         data_path = Path("data", "data.txt")
-#         if data_path.exists() and data_path.stat().st_size > 0:
-#             return jsonify({
-#                 "data_ready": True,
-#                 "file_size": data_path.stat().st_size,
-#                 "status": "success"
-#             })
-#         else:
-#             return jsonify({
-#                 "data_ready": False,
-#                 "status": "success"
-#             })
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
