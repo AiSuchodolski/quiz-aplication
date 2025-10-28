@@ -16,7 +16,10 @@ app = Flask(__name__)
 # CORS configuration for production
 CORS(app, resources={
     r"/*": {
-        "origins": ["*"],  # In production, replace * with your Vercel URL
+        "origins": [
+            "https://quiz-aplication2.vercel.app",  # Frontend on Vercel
+            "http://localhost:5003"  # Local development
+        ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "X-OpenAI-API-Key"]
     }

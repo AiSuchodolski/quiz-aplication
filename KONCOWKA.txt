@@ -1,0 +1,23 @@
+🎉 GOTOWE! Teraz wyślij zmiany na GitHub i Render automatycznie wdroży:
+
+KOMENDY DO WYKONANIA:
+
+cd "C:\Users\ASUS\Desktop\AISuchodolski\Ready 4 AI\Aplikacja\quiz-aplication"
+git add Backend/app.py
+git commit -m "Update CORS for Vercel frontend"
+git push
+
+⏱️  Render automatycznie wdroży zmiany za około 5 minut
+
+📱 Twoja aplikacja:
+- Backend: https://quiz-backend-rn63.onrender.com
+- Frontend: https://quiz-aplication2.vercel.app
+
+✅ Po deploy użytkownicy mogą:
+1. Wejść na Vercel URL
+2. Wprowadzić swój klucz API OpenAI
+3. Przesyłać pliki
+4. Rozwiązywać quizy!
+
+🎊 Gratulacje!
+

@@ -1,0 +1,17 @@
+🔧 NAPRAWIONE! Problem z wersją biblioteki OpenAI
+
+Zmieniłem w requirements.txt:
+- openai==1.3.0  ❌ (za stara)
+- openai>=1.12.0 ✅ (najnowsza)
+
+Wyślij zmiany:
+
+cd "C:\Users\ASUS\Desktop\AISuchodolski\Ready 4 AI\Aplikacja\quiz-aplication"
+git add Backend/requirements.txt
+git commit -m "Update OpenAI library version"
+git push
+
+⏱️ Render automatycznie wdroży w ~5 minut
+
+Po deploy spróbuj ponownie utworzyć quiz!
+
