@@ -1,19 +1,16 @@
-# Render configuration file
-services:
-  - type: web
-    name: quiz-backend
-    env: python
-    region: frankfurt
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
-    envVars:
-      - key: PORT
-        value: 5000
-      - key: PYTHON_VERSION
-        value: 3.11.7
-    disk:
-      name: quiz-data-disk
-      mountPath: /opt/render/project/src
-      sizeGB: 1
+# Render configuration file - DISABLED (use manual settings in Dashboard instead)
+# Problem: Root directory mismatch
+# Solution: Set Root Directory manually in Render Dashboard to "Backend" or leave empty
+
+# services:
+#   - type: web
+#     name: quiz-backend
+#     env: python
+#     region: frankfurt
+#     plan: free
+#     buildCommand: pip install -r requirements.txt && python -m pip install --upgrade pip
+#     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+#     envVars:
+#       - key: PYTHON_VERSION
+#         value: 3.11.7
 

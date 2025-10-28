@@ -14,9 +14,11 @@ ENV/
 .env.local
 .env.*.local
 
-# Data files
+# Data files (keep directory structure)
 data/data.txt
 upload/*
+!upload/.gitkeep
+!data/.gitkeep
 
 # IDEs
 .vscode/

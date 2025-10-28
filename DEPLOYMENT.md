@@ -29,15 +29,16 @@ git push
 1. Zaloguj się na [Render Dashboard](https://dashboard.render.com)
 2. Kliknij **"New +"** → **"Web Service"**
 3. Połącz swoje repozytorium
-4. Wybierz folder `Backend` jako root directory
+4. **WAŻNE**: Ustawienia Root Directory:
+   - Jeśli Backend jest w root repo → zostaw **PUSTE** lub wpisz `Backend`
+   - Jeśli Backend jest w `quiz-aplication/Backend` → wpisz `quiz-aplication/Backend`
 5. Ustawienia:
    - **Name**: quiz-backend (lub dowolna nazwa)
    - **Region**: Najbliższy do twoich użytkowników
    - **Branch**: main/master
-   - **Root Directory**: quiz-aplication/Backend
    - **Runtime**: Python 3
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
+   - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT`
 
 #### 3. Zmienne środowiskowe (opcjonalne)
 W sekcji "Environment" dodaj (jeśli potrzebujesz):
