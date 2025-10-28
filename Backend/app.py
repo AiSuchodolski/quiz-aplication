@@ -3,7 +3,7 @@ from flask_cors import CORS
 from pathlib import Path
 from quiz_main import (existing_questions, 
                         reset_quiz, 
-                        get_quiz_question, 
+                        get_quiz_question_with_key, 
                         check_answer, 
                         get_current_question, 
                         get_current_result, 
@@ -33,34 +33,50 @@ def quiz():
 
 @app.route('/quiz/start')
 def quiz_start():
-    reset_quiz()
-    result = delete_upload_folder()
-    if result["status"] == "success":
-        return jsonify({
-            "message" : "Witaj w quizie! Powodzenia!",
-            "rules" : [
-                "Zadawane pytania dotyczą przesłanych przez ciebie materiałów.",
-                "Z podanych odpowiedzi tylko jedna jest prawidłowa.",
-                "Podaj A, B, C lub D.",
-            ],
-            "status" : "success"
-        })
-    else:
-        return jsonify({"status" : "error", "message": result["message"]}), 500
+    try:
+        # Pobierz klucz API z nagłówka (opcjonalny dla /start, ale zalecany)
+        api_key = request.headers.get('X-OpenAI-API-Key')
+        
+        reset_quiz()
+        result = delete_upload_folder()
+        if result["status"] == "success":
+            return jsonify({
+                "message" : "Witaj w quizie! Powodzenia!",
+                "rules" : [
+                    "Zadawane pytania dotyczą przesłanych przez ciebie materiałów.",
+                    "Z podanych odpowiedzi tylko jedna jest prawidłowa.",
+                    "Podaj A, B, C lub D.",
+                ],
+                "status" : "success"
+            })
+        else:
+            return jsonify({"status" : "error", "message": result["message"]}), 500
+    except Exception as e:
+        return jsonify({"status" : "error", "message": str(e)}), 500
 
 
 @app.route('/quiz/question')
 def quiz_question():
-    question = get_quiz_question()
     try:
+        # Pobierz klucz API z nagłówka
+        api_key = request.headers.get('X-OpenAI-API-Key')
+        if not api_key:
+            return jsonify({"status": "error", "message": "Brak klucza API OpenAI. Upewnij się, że wprowadziłeś i zapisałeś klucz API na ekranie głównym."}), 400
+        
+        question = get_quiz_question_with_key(api_key)
+        if not question:
+            return jsonify({"status": "error", "message": "Błąd podczas generowania pytania. Sprawdź poprawność klucza API."}), 500
+            
         return jsonify({
             "question" : question["question"],   
             "number_of_questions" : len(existing_questions),
             "answers" : question["answers"],
             "status" : "success"
         })
+    except ValueError as e:
+        return jsonify({"status": "error", "message": str(e)}), 400
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status": "error", "message": f"Błąd podczas generowania pytania: {str(e)}"}), 500
 
 
 @app.route('/quiz/answer', methods=['POST'])

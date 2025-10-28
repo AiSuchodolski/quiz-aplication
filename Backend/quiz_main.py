@@ -38,10 +38,14 @@ def user_path_data():
         raise ValueError(f"Error reading data.txt: {e}")
 
 
-def get_ai_answers(content):
+def get_ai_answers(content, api_key=None):
     try:
-        # Ustawienie klucza API
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        # Ustawienie klucza API - jeśli podano jako parametr, użyj go; w przeciwnym razie użyj z środowiska
+        openai_key = api_key if api_key else os.getenv('OPENAI_API_KEY')
+        if not openai_key:
+            raise ValueError("Brak klucza API - nie podano ani jako parametr ani w zmiennych środowiskowych")
+        
+        client = OpenAI(api_key=openai_key)
         
         response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -137,6 +141,22 @@ def get_quiz_question():
         current_answers = quiz_data["answers"]
         current_correct_answer = quiz_data["correct_answer"]
         # print(f'DEBUG: po procesowaniu {number_of_questions}')
+        return quiz_data
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+def get_quiz_question_with_key(api_key):
+    """Wersja funkcji get_quiz_question która przyjmuje klucz API jako parametr"""
+    global number_of_questions, current_question, current_answers, current_correct_answer
+    try:
+        content = user_path_data()
+        quiz_data = get_ai_answers(content, api_key=api_key)
+        existing_questions.append(quiz_data["question"])
+        current_question = quiz_data["question"]
+        current_answers = quiz_data["answers"]
+        current_correct_answer = quiz_data["correct_answer"]
         return quiz_data
     except Exception as e:
         print(f"Error: {e}")

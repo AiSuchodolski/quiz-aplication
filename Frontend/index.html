@@ -452,12 +452,35 @@
                 <div class="rules">
                     <h3>Jak to działa:</h3>
                     <ul>
+                        <li>Wprowadź swój klucz API OpenAI (bezpiecznie przechowywany tylko w Twojej przeglądarce)</li>
                         <li>Sprawdź zawartość aktualnych danych</li>
                         <li>Zdecyduj czy zachować istniejące dane czy je usunąć</li>
                         <li>Prześlij nowe pliki (PDF, DOCX, CSV, TXT)</li>
                         <li>Przetwórz pliki i dodaj do bazy danych</li>
                         <li>Rozpocznij quiz na podstawie wszystkich danych</li>
                     </ul>
+                </div>
+
+                <div id="apiKeySection" style="background: #e3f2fd; border-radius: 15px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #1976d2; margin-bottom: 15px;">🔑 Klucz API OpenAI</h3>
+                    <div id="apiKeyInputContainer">
+                        <input 
+                            type="password" 
+                            id="apiKeyInput" 
+                            placeholder="Wprowadź swój klucz API OpenAI (np. sk-...)" 
+                            style="width: 100%; padding: 12px; border: 2px solid #bbdefb; border-radius: 8px; font-size: 1em; margin-bottom: 10px;"
+                        >
+                        <button class="btn" onclick="saveApiKey()" style="width: 100%;">Zapisz klucz API</button>
+                    </div>
+                    <div id="apiKeySavedContainer" style="display: none; text-align: center;">
+                        <p style="font-size: 1.2em; color: #28a745; font-weight: bold; margin: 10px 0;">
+                            ✓ Klucz API zapisany pomyślnie!
+                        </p>
+                        <button class="btn btn-secondary" onclick="changeApiKey()" style="width: 100%; margin-top: 10px;">Zmień klucz API</button>
+                    </div>
+                    <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                        <strong>Bezpieczeństwo:</strong> Twój klucz API jest przechowywany tylko w Twojej przeglądarce (sessionStorage) i nigdy nie jest zapisywany na serwerze.
+                    </p>
                 </div>
 
                 <div style="text-align: center; margin-top: 30px;">
@@ -583,8 +606,69 @@
         let currentFileName = null;
         let isProcessing = false;
 
-        // Inicjalizacja aplikacji - wyczyść folder upload przy starcie
+        // Zarządzanie kluczem API
+        function saveApiKey() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (!apiKey) {
+                showError('Proszę wprowadzić klucz API');
+                return;
+            }
+            if (!apiKey.startsWith('sk-')) {
+                if (confirm('Klucz API OpenAI zazwyczaj zaczyna się od "sk-". Czy na pewno chcesz kontynuować?')) {
+                    sessionStorage.setItem('openai_api_key', apiKey);
+                    document.getElementById('apiKeyInputContainer').style.display = 'none';
+                    document.getElementById('apiKeySavedContainer').style.display = 'block';
+                    showSuccess('Klucz API został zapisany bezpiecznie!');
+                }
+            } else {
+                sessionStorage.setItem('openai_api_key', apiKey);
+                document.getElementById('apiKeyInputContainer').style.display = 'none';
+                document.getElementById('apiKeySavedContainer').style.display = 'block';
+                showSuccess('Klucz API został zapisany bezpiecznie!');
+            }
+        }
+
+        function changeApiKey() {
+            document.getElementById('apiKeyInputContainer').style.display = 'block';
+            document.getElementById('apiKeySavedContainer').style.display = 'none';
+            document.getElementById('apiKeyInput').value = '';
+            document.getElementById('apiKeyInput').focus();
+        }
+
+        function getApiKey() {
+            return sessionStorage.getItem('openai_api_key');
+        }
+
+        function checkApiKey() {
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                showError('Proszę najpierw wprowadzić i zapisać klucz API OpenAI');
+                return false;
+            }
+            return true;
+        }
+
+        // Helper function to get headers with API key
+        function getHeaders() {
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            const apiKey = getApiKey();
+            if (apiKey) {
+                headers['X-OpenAI-API-Key'] = apiKey;
+            }
+            return headers;
+        }
+
+        // Inicjalizacja aplikacji
         window.addEventListener('DOMContentLoaded', async function() {
+            // Sprawdź czy klucz API jest już zapisany
+            const savedKey = getApiKey();
+            if (savedKey) {
+                document.getElementById('apiKeyInputContainer').style.display = 'none';
+                document.getElementById('apiKeySavedContainer').style.display = 'block';
+            }
+            
             try {
                 await fetch(`${API_BASE_URL}/quiz/start`);
                 console.log('Upload folder został wyczyszczony');
@@ -983,8 +1067,16 @@
 
         // Rozpoczęcie quizu
         async function startQuiz() {
+            if (!checkApiKey()) {
+                return;
+            }
             try {
-                const response = await fetch(`${API_BASE_URL}/quiz/start`);
+                const apiKey = getApiKey();
+                const response = await fetch(`${API_BASE_URL}/quiz/start`, {
+                    headers: {
+                        'X-OpenAI-API-Key': apiKey
+                    }
+                });
                 const data = await response.json();
                 
                 if (data.status === 'success') {
@@ -1010,14 +1102,26 @@
                 document.getElementById('feedback').style.display = 'none';
                 document.getElementById('nextBtn').style.display = 'none';
                 
-                const response = await fetch(`${API_BASE_URL}/quiz/question`);
+                const apiKey = getApiKey();
+                const response = await fetch(`${API_BASE_URL}/quiz/question`, {
+                    headers: {
+                        'X-OpenAI-API-Key': apiKey
+                    }
+                });
                 const data = await response.json();
                 
                 if (data.status === 'success') {
                     currentQuestionData = data;
                     displayQuestion(data);
                 } else {
-                    showError('Błąd podczas ładowania pytania');
+                    const errorMsg = data.message || 'Błąd podczas ładowania pytania';
+                    showError(errorMsg);
+                    // Jeśli to błąd związany z kluczem API, wróć do ekranu głównego
+                    if (response.status === 400 || errorMsg.includes('klucz API')) {
+                        setTimeout(() => {
+                            backToMain();
+                        }, 3000);
+                    }
                 }
             } catch (error) {
                 showError('Błąd podczas ładowania pytania: ' + error.message);
