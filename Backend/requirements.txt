@@ -2,6 +2,9 @@
 Flask==3.0.0
 Flask-CORS==4.0.0
 
+# Server (for production)
+gunicorn==21.2.0
+
 # Environment Variables
 python-dotenv==1.0.0
 

@@ -13,7 +13,14 @@ from quiz_main import (existing_questions,
 from processing import processing_upload_files
 
 app = Flask(__name__)
-CORS(app)
+# CORS configuration for production
+CORS(app, resources={
+    r"/*": {
+        "origins": ["*"],  # In production, replace * with your Vercel URL
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "X-OpenAI-API-Key"]
+    }
+})
 app.url_map.strict_slashes = False
 
 
@@ -180,4 +187,6 @@ def quiz_delete_upload_file():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5003, host='localhost')
+    import os
+    port = int(os.environ.get('PORT', 5003))
+    app.run(debug=False, port=port, host='0.0.0.0')

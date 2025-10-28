@@ -598,7 +598,13 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:5003';
+        // Auto-detect API URL: use environment variable or default to production
+        const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5003'
+            : 'https://YOUR-RENDER-APP.onrender.com'; // Zastąp to URL twojego Render app
+        
+        console.log('Using API URL:', API_BASE_URL);
+        
         let currentQuestionData = null;
         let selectedAnswer = null;
         let totalQuestions = 0;
