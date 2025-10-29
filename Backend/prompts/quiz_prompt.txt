@@ -1,33 +1,49 @@
-INSTRUKCJE:
-1. Stwórz pytanie wielokrotnego wyboru na podstawie tekstu: {user_path_data()}
-2. 4 odpowiedzi (A, B, C, D), tylko jedna prawidłowa
-3. Nie powtarzaj pytań z listy: {existing_questions}
-4. Pytanie musi sprawdzać zrozumienie tekstu
-5. Odpowiedzi błędne mają być prawdopodobne
-6. Zmieniaj tak aby raz była poprawna odpowiedź A innym razem C innym B tak aby to było losowe.
+INSTRUCTIONS:
+1. Create a multiple-choice question based on the text: {user_path_data()}
+2. 4 answers (A, B, C, D), only one correct
+3. DO NOT create questions that are semantically similar or ask about the same fact as questions in this list: {existing_questions}
+4. The question must test understanding of the text
+5. Wrong answers must be plausible and realistic
+6. **CRITICAL: Randomize the correct answer position - it MUST NOT always be A. Distribute correct answers evenly across A, B, C, and D options.**
+7. Vary question types: ask about causes, effects, relationships, definitions, processes, or context - not just dates and facts
+8. Before generating, check if the core concept/fact has already been asked about in a different way
 
-FORMAT ODPOWIEDZI (TYLKO CZYSTY JSON):
+QUIZ LANGUAGE: Polish (all questions and answers must be in Polish)
+
+RESPONSE FORMAT (ONLY CLEAN JSON):
 {
-  "question": "Treść pytania",
+  "question": "Question text in Polish",
   "answers": {
-    "A": "Pierwsza odpowiedź",
-    "B": "Druga odpowiedź", 
-    "C": "Trzecia odpowiedź",
-    "D": "Czwarta odpowiedź"
+    "A": "First answer in Polish",
+    "B": "Second answer in Polish", 
+    "C": "Third answer in Polish",
+    "D": "Fourth answer in Polish"
   },
   "correct_answer": "A"
 }
 
-PRZYKŁAD:
+EXAMPLE 1 (correct answer: B):
 {
-  "question": "Kiedy rozpoczęła się II wojna światowa?",
+  "question": "Jakie było główne znaczenie kampanii wrześniowej dla dalszego przebiegu II wojny światowej?",
   "answers": {
-    "A": "1 września 1938 roku",
-    "B": "1 września 1939 roku",
-    "C": "3 września 1939 roku", 
-    "D": "1 września 1940 roku"
+    "A": "Doprowadziła do natychmiastowej kapitulacji Francji",
+    "B": "Pokazała skuteczność taktyki blitzkriegu i zachęciła Hitlera do dalszej ekspansji",
+    "C": "Spowodowała przystąpienie USA do wojny",
+    "D": "Zakończyła się zwycięstwem Polski"
   },
   "correct_answer": "B"
 }
 
-Odpowiedz TYLKO w formacie JSON powyżej, bez dodatkowego tekstu.
+EXAMPLE 2 (correct answer: D):
+{
+  "question": "Który kraj jako pierwszy wypowiedział wojnę Niemcom po ataku na Polskę?",
+  "answers": {
+    "A": "Stany Zjednoczone",
+    "B": "Związek Radziecki",
+    "C": "Francja",
+    "D": "Wielka Brytania"
+  },
+  "correct_answer": "D"
+}
+
+IMPORTANT: Respond ONLY with JSON in the format above, without any additional text or explanations.
