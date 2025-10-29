@@ -146,3 +146,6 @@ Jeśli nadal masz problem, podaj:
 ---
 **Pamiętaj**: Najważniejsze to sprawdzić Build Logs w Render Dashboard - tam jest dokładna informacja o tym, co poszło nie tak!
 
+
+
+

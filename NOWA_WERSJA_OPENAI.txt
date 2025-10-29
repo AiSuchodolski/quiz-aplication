@@ -15,3 +15,6 @@ git push
 
 Po deploy spróbuj ponownie utworzyć quiz!
 
+
+
+

@@ -125,11 +125,14 @@ def quiz_upload():
             return jsonify({"status" : "error", "message": "Nieprawidłowy typ pliku"}), 400        
         if file.filename in file_names:
             return jsonify({"status" : "error", "message": "Plik o takiej nazwie został już przetworzony"}), 400
-        upload_path = Path("upload", file.filename)
-        if upload_path.exists():
-            return jsonify({"status" : "error", "message": "Plik o takiej nazwie istnieje i czeka na przetworzenie"}), 400
+        # upload_path = Path("upload", file.filename)
+        # if upload_path.exists():
+        #     return jsonify({"status" : "error", "message": "Plik o takiej nazwie istnieje i czeka na przetworzenie"}), 400
         else:    
+            upload_path = Path("upload", file.filename)
             upload_path.parent.mkdir(parents=True, exist_ok=True)
+            if upload_path.exists():
+                return jsonify({"status" : "error", "message": "Plik o takiej nazwie istnieje i czeka na przetworzenie"}), 400
             file.save(upload_path)
             return jsonify({"message": "Plik załadowany pomyślnie i czeka na przetworzenie", "file": file.filename, "status": "success"})
     except Exception as e:

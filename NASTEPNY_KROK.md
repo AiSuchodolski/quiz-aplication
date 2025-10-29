@@ -112,3 +112,6 @@ Jeśli chcesz śledzić wydajność:
 
 To opcjonalne - podstawowa aplikacja już działa! ✅
 
+
+
+

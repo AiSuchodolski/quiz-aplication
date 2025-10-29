@@ -86,3 +86,6 @@ Start Command: gunicorn app:app --bind 0.0.0.0:$PORT
 2. W Render kliknij "Manual Deploy"
 3. Sprawdź Logs - powinno działać!
 
+
+
+
