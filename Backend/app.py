@@ -156,6 +156,7 @@ def quiz_processing_get():
 
 @app.route('/quiz/processing', methods=['POST'])
 def quiz_processing_post():
+    global file_names
     data_path = Path("data", "data.txt")
     try:     
         if request.json['user_decision'] == True:
@@ -163,6 +164,7 @@ def quiz_processing_post():
         else:
             with data_path.open("w", encoding="utf-8") as open_data_file:
                 open_data_file.write("")
+            file_names.clear()
             return jsonify({"status": "success", "message": "Dotychczasowe dane zostały usunięte"})
     except Exception as e:
         return jsonify({"status" : "error", "message": str(e)}), 500
